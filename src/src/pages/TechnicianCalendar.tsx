@@ -644,6 +644,12 @@ function TechnicianDashboardView() {
       workbenchProjects.map((project) => [project.id, project.features[0]?.id])
     )
   );
+  const [selectedResource, setSelectedResource] = useState<KnowledgeResource | null>(
+    null
+  );
+  const [activeSupportShortcut, setActiveSupportShortcut] =
+    useState<SupportShortcut | null>(null);
+  const [supportNote, setSupportNote] = useState<string>("");
 
   const activeFeature =
     activeFeatureTab[activeWorkbench] ?? workbenchProjects[0]?.features[0]?.id;
@@ -687,8 +693,15 @@ function TechnicianDashboardView() {
     );
   };
 
-  const handleShortcutClick = (title: string) => {
-    showMessage(`${title} باز شد. مسئول مربوطه در جریان قرار گرفت.`);
+  const handleOpenResource = (resource: KnowledgeResource) => {
+    setSelectedResource(resource);
+    showMessage(`منبع «${resource.title}» باز شد و آماده استفاده است.`);
+  };
+
+  const handleShortcutClick = (shortcut: SupportShortcut) => {
+    setActiveSupportShortcut(shortcut);
+    setSupportNote(`درخواست سریع از کانال «${shortcut.title}» ثبت شود.`);
+    showMessage(`${shortcut.title} باز شد. مسئول مربوطه در جریان قرار گرفت.`);
   };
 
   const handleFeatureAction = (label: string) => {
@@ -709,6 +722,27 @@ function TechnicianDashboardView() {
     showMessage(
       `ماموریت «${fieldMissionForm.title}» برای ${formattedDate} در ${fieldMissionForm.window} ثبت شد.`
     );
+  };
+
+  const handleDownloadResource = () => {
+    if (!selectedResource) return;
+    showMessage(`فایل «${selectedResource.title}» دانلود و در صف بررسی قرار گرفت.`);
+    setSelectedResource(null);
+  };
+
+  const handleShareResource = () => {
+    if (!selectedResource) return;
+    showMessage(`منبع «${selectedResource.title}» برای تیم میدانی ارسال شد.`);
+    setSelectedResource(null);
+  };
+
+  const handleSendSupportRequest = () => {
+    if (!activeSupportShortcut) return;
+    showMessage(
+      `پیام شما در «${activeSupportShortcut.title}» ارسال شد. پاسخ در کم‌تر از ۱۰ دقیقه ارائه می‌شود.`
+    );
+    setSupportNote("");
+    setActiveSupportShortcut(null);
   };
 
   const metrics = metricsByRange[timeRange];
@@ -1429,7 +1463,11 @@ function TechnicianDashboardView() {
                         <p className="font-medium text-gray-900">{resource.title}</p>
                         <p className="text-sm text-gray-600">{resource.detail}</p>
                       </div>
-                      <Button variant="ghost" className="text-sm text-gray-700">
+                      <Button
+                        variant="ghost"
+                        className="text-sm text-gray-700"
+                        onClick={() => handleOpenResource(resource)}
+                      >
                         <Icon name="download" size={16} className="ml-2" />
                         باز کردن
                       </Button>
@@ -1448,7 +1486,7 @@ function TechnicianDashboardView() {
                     <button
                       key={shortcut.id}
                       className="p-3 rounded-xl border border-gray-100 bg-gray-50 text-right hover:border-gray-200 transition"
-                      onClick={() => handleShortcutClick(shortcut.title)}
+                      onClick={() => handleShortcutClick(shortcut)}
                     >
                       <p className="font-medium text-gray-900">{shortcut.title}</p>
                       <p className="text-sm text-gray-600">{shortcut.detail}</p>
@@ -1560,6 +1598,103 @@ function TechnicianDashboardView() {
               </Button>
               <Button variant="primary" className="text-sm" onClick={handleSubmitFieldMission}>
                 ثبت و هماهنگی
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        isOpen={!!selectedResource}
+        onClose={() => setSelectedResource(null)}
+        title={selectedResource?.title ?? "منبع دانش"}
+      >
+        <div className="space-y-4 text-right">
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {selectedResource?.detail ?? "نسخه به‌روز شده منبع دانش"}
+          </p>
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3 space-y-2 text-sm text-gray-700">
+            <div className="flex items-center justify-between flex-row-reverse">
+              <span className="text-gray-500">وضعیت دسترسی</span>
+              <span className="px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs border border-emerald-100">
+                آماده دانلود
+              </span>
+            </div>
+            <div className="flex items-center gap-2 flex-row-reverse text-gray-600">
+              <Icon name="shield" size={16} />
+              دسترسی شما در اتاق داده ایمن ثبت شد و امکان اشتراک‌گذاری با تیم وجود دارد.
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 flex-row-reverse">
+            <Button variant="ghost" className="text-sm" onClick={() => setSelectedResource(null)}>
+              بستن
+            </Button>
+            <Button variant="secondary" className="text-sm" onClick={handleShareResource}>
+              <Icon name="share" size={16} className="ml-2" />
+              اشتراک‌گذاری با تیم
+            </Button>
+            <Button variant="primary" className="text-sm" onClick={handleDownloadResource}>
+              <Icon name="download" size={16} className="ml-2" />
+              دانلود و باز کردن
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        isOpen={!!activeSupportShortcut}
+        onClose={() => setActiveSupportShortcut(null)}
+        title={activeSupportShortcut ? `حمایت سریع · ${activeSupportShortcut.title}` : "حمایت سریع"}
+      >
+        <div className="space-y-4 text-right">
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-3 text-sm text-gray-700 space-y-2">
+            <div className="flex items-center gap-2 flex-row-reverse">
+              <Icon name="bolt" size={16} className="ml-1" />
+              {activeSupportShortcut?.detail || "کانال آماده پاسخ‌گویی"}
+            </div>
+            <div className="text-xs text-gray-500 flex items-center gap-2 flex-row-reverse">
+              <Icon name="clock" size={14} />
+              نوبت شما ثبت شد. میانگین پاسخ‌گویی کمتر از ۱۰ دقیقه است.
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5 text-right">
+              توضیح مختصر برای تیم پشتیبانی
+            </label>
+            <textarea
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-right bg-white focus:outline-none focus:ring-2 focus:ring-gray-900"
+              rows={3}
+              value={supportNote}
+              onChange={(e) => setSupportNote(e.target.value)}
+              placeholder="شرح مشکل، شماره UTN یا نیاز فوری را بنویسید"
+            />
+          </div>
+
+          <div className="flex justify-between items-center flex-row-reverse">
+            <div className="text-xs text-gray-500">
+              به‌صورت خودکار لینک گفتگو و پیگیری برای شما فعال می‌شود.
+            </div>
+            <div className="flex gap-3 flex-row-reverse">
+              <Button variant="ghost" className="text-sm" onClick={() => setActiveSupportShortcut(null)}>
+                انصراف
+              </Button>
+              <Button
+                variant="secondary"
+                className="text-sm"
+                onClick={() => {
+                  if (!activeSupportShortcut) return;
+                  showMessage(
+                    `یادداشت شما برای کانال ${activeSupportShortcut.title} ارسال شد.`
+                  );
+                }}
+              >
+                <Icon name="message" size={16} className="ml-2" />
+                ارسال یادداشت
+              </Button>
+              <Button variant="primary" className="text-sm" onClick={handleSendSupportRequest}>
+                <Icon name="arrow-left" size={16} className="ml-2" />
+                باز کردن کانال
               </Button>
             </div>
           </div>
