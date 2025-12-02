@@ -100,6 +100,32 @@ type CollabQuickLink = {
   badgeClass: string;
 };
 
+type QuickLinkActionStep = {
+  id: string;
+  title: string;
+  detail: string;
+  helper?: string;
+  done: boolean;
+};
+
+type QuickLinkArtifact = {
+  label: string;
+  value: string;
+  helper?: string;
+};
+
+type QuickLinkPlaybook = {
+  steps: Omit<QuickLinkActionStep, "done">[];
+  artifacts: QuickLinkArtifact[];
+  note: string;
+};
+
+type QuickLinkExecution = {
+  link: CollabQuickLink;
+  steps: QuickLinkActionStep[];
+  artifacts: QuickLinkArtifact[];
+};
+
 type KnowledgeResource = {
   id: string;
   title: string;
@@ -360,6 +386,86 @@ const collabQuickLinks: CollabQuickLink[] = [
   { id: "quick-2", title: "اشتراک نقشه اصلاحی بدنه", detail: "اتاق داده ایمن · PDF + DWG", badge: "Data Room", badgeClass: "bg-blue-50 text-blue-700 border-blue-100" },
   { id: "quick-3", title: "ارسال وضعیت برای مدیر پروژه", detail: "داشبورد مدیران · گزارش لحظه‌ای", badge: "مدیریت", badgeClass: "bg-amber-50 text-amber-700 border-amber-100" },
 ];
+
+const quickLinkPlaybook: Record<string, QuickLinkPlaybook> = {
+  "quick-1": {
+    steps: [
+      {
+        id: "step-qa-meet",
+        title: "ایجاد لینک جلسه آنلاین QA",
+        detail: "لینک هماهنگی مشترک برای امروز ۱۷:۳۰ آماده می‌شود.",
+        helper: "پلتفرم داخلی · ضبط خودکار روشن است",
+      },
+      {
+        id: "step-qa-sms",
+        title: "ارسال SMS و ایمیل یادآور",
+        detail: "به سرپرست QA و مدیر پروژه اطلاع‌رسانی می‌شود.",
+        helper: "شامل لینک تقویم + لوکیشن اتاق داده",
+      },
+      {
+        id: "step-qa-checklist",
+        title: "ضمیمه چک‌لیست تحویل",
+        detail: "چک‌لیست QC + گزارش لرزش به دعوت اضافه می‌شود.",
+      },
+    ],
+    artifacts: [
+      { label: "لینک جلسه", value: "https://meet.tce/qa-handover", helper: "کد دسترسی: 214" },
+      { label: "گیرندگان", value: "ندا شریفی · مدیر پروژه · QA مرکزی" },
+      { label: "پیوست", value: "Checklist-QA.pdf, Vibration-Report.xlsx" },
+    ],
+    note: "لطفاً برای تحویل مشترک آماده باشید. صورتجلسه و ویدیو خودکار ذخیره می‌شود.",
+  },
+  "quick-2": {
+    steps: [
+      {
+        id: "step-data-room",
+        title: "ساخت پوشه در اتاق داده ایمن",
+        detail: "پوشه پروژه با دسترسی محدود برای نقشه‌های اصلاحی ایجاد می‌شود.",
+      },
+      {
+        id: "step-upload",
+        title: "آپلود PDF و DWG",
+        detail: "آخرین نسخه نقشه اصلاحی و توضیحات نصب بارگذاری می‌گردد.",
+      },
+      {
+        id: "step-expiry",
+        title: "تعیین انقضا و لاگ دسترسی",
+        detail: "لینک تا ۴۸ ساعت فعال و هر دانلود ثبت می‌شود.",
+      },
+    ],
+    artifacts: [
+      { label: "لینک امن", value: "https://secure-room/utn-2045", helper: "دسترسی: فقط QA و مدیر پروژه" },
+      { label: "کنترل نسخه", value: "v3.2 · ثبت شد در Data Room" },
+      { label: "یادآور", value: "پیام به گروه کارگاه + QA" },
+    ],
+    note: "نسخه جدید نقشه بدنه در اتاق داده ایمن بارگذاری شد. لطفاً دریافت و تایید را اعلام کنید.",
+  },
+  "quick-3": {
+    steps: [
+      {
+        id: "step-summary",
+        title: "تولید خلاصه وضعیت",
+        detail: "گزارش لحظه‌ای با KPI ها از برد فنی جمع‌آوری می‌شود.",
+      },
+      {
+        id: "step-dashboard",
+        title: "انتشار در داشبورد مدیران",
+        detail: "کارت وضعیت پروژه و ریسک‌ها بروزرسانی می‌شود.",
+      },
+      {
+        id: "step-notify",
+        title: "اطلاع‌رسانی مدیر پروژه",
+        detail: "پیام در کانال مدیریت و ایمیل خلاصه ارسال می‌شود.",
+      },
+    ],
+    artifacts: [
+      { label: "لینک داشبورد", value: "https://exec.tce/dashboard/utn-2045", helper: "به‌روزرسانی: همین حالا" },
+      { label: "دامنه گزارش", value: "پیشرفت ۷۲٪ · ریسک کیفیت: متوسط" },
+      { label: "کانال اعلام", value: "مدیر پروژه + گروه مدیریت" },
+    ],
+    note: "به‌روزرسانی وضعیت پروژه برای مدیران ارسال شد. در صورت نیاز، جلسه کوتاه هماهنگی برگزار می‌شود.",
+  },
+};
 
 const knowledgeBaseResources: KnowledgeResource[] = [
   { id: "kb-root-cause", title: "راهنمای تحلیل ریشه‌ای ارتعاش", detail: "چک‌لیست ۱۲ مرحله‌ای برای یافتن سریع منشأ ایراد" },
@@ -636,6 +742,10 @@ function TechnicianDashboardView() {
   });
   const [scheduledMission, setScheduledMission] = useState<FieldMissionForm | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [quickLinkStatuses, setQuickLinkStatuses] = useState<Record<string, string>>({});
+  const [activeQuickLink, setActiveQuickLink] = useState<QuickLinkExecution | null>(null);
+  const [quickLinkNote, setQuickLinkNote] = useState("");
+  const [showQuickLinkDialog, setShowQuickLinkDialog] = useState(false);
   const [activeWorkbench, setActiveWorkbench] = useState<string>(
     workbenchProjects[0]?.id ?? ""
   );
@@ -693,6 +803,51 @@ function TechnicianDashboardView() {
 
   const handleFeatureAction = (label: string) => {
     showMessage(`${label} اجرا شد و در سوابق فعالیت ثبت گردید.`);
+  };
+
+  const handleStartQuickLink = (link: CollabQuickLink) => {
+    const playbook = quickLinkPlaybook[link.id];
+    if (!playbook) return;
+
+    setActiveQuickLink({
+      link,
+      steps: playbook.steps.map((step) => ({ ...step, done: true })),
+      artifacts: playbook.artifacts,
+    });
+    setQuickLinkNote(playbook.note);
+    setQuickLinkStatuses((prev) => ({
+      ...prev,
+      [link.id]: "در حال آماده‌سازی خروجی‌ها...",
+    }));
+    setShowQuickLinkDialog(true);
+    showMessage(`جریان «${link.title}» باز شد. خروجی پیشنهادی را تایید کنید.`);
+  };
+
+  const toggleQuickLinkStep = (stepId: string) => {
+    setActiveQuickLink((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        steps: prev.steps.map((step) =>
+          step.id === stepId ? { ...step, done: !step.done } : step
+        ),
+      };
+    });
+  };
+
+  const handleConfirmQuickLink = () => {
+    if (!activeQuickLink) return;
+
+    const completed = activeQuickLink.steps.filter((step) => step.done).length;
+    const total = activeQuickLink.steps.length;
+
+    setQuickLinkStatuses((prev) => ({
+      ...prev,
+      [activeQuickLink.link.id]: `ارسال شد (${completed}/${total}) · ${quickLinkNote || "بدون یادداشت اضافی"}`,
+    }));
+
+    setShowQuickLinkDialog(false);
+    showMessage(`میانبر «${activeQuickLink.link.title}» ارسال و ثبت شد.`);
   };
 
   const handleSubmitFieldMission = () => {
@@ -1303,7 +1458,18 @@ function TechnicianDashboardView() {
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 leading-relaxed">{link.detail}</p>
-                      <Button variant="ghost" className="text-sm text-gray-700">
+                      {quickLinkStatuses[link.id] ? (
+                        <div className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+                          {quickLinkStatuses[link.id]}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-500">ارسال لینک، یادآور و گزارش با یک کلیک</p>
+                      )}
+                      <Button
+                        variant="ghost"
+                        className="text-sm text-gray-700"
+                        onClick={() => handleStartQuickLink(link)}
+                      >
                         <Icon name="arrow-left" size={16} className="ml-2" />
                         شروع
                       </Button>
@@ -1460,6 +1626,81 @@ function TechnicianDashboardView() {
           </>
         )}
       </div>
+
+      <Dialog
+        isOpen={showQuickLinkDialog && Boolean(activeQuickLink)}
+        onClose={() => setShowQuickLinkDialog(false)}
+        title={activeQuickLink ? `شروع ${activeQuickLink.link.title}` : "جریان سریع"}
+      >
+        {activeQuickLink && (
+          <div className="space-y-4 text-right">
+            <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 text-sm text-gray-700">
+              <div className="flex items-center justify-between flex-row-reverse">
+                <span className="font-semibold text-gray-900">{activeQuickLink.link.detail}</span>
+                <span className="text-xs px-2 py-1 rounded-lg border bg-gray-900 text-white">
+                  {activeQuickLink.link.badge}
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 mt-2">پیشنهاد اجرای یک‌مرحله‌ای؛ وضعیت هر مرحله را می‌توانید تغییر دهید.</p>
+            </div>
+
+            <div className="space-y-2">
+              {activeQuickLink.steps.map((step) => (
+                <label
+                  key={step.id}
+                  className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-200 cursor-pointer flex-row-reverse"
+                >
+                  <input
+                    type="checkbox"
+                    checked={step.done}
+                    onChange={() => toggleQuickLinkStep(step.id)}
+                    className="mt-1 ml-1"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{step.title}</p>
+                    <p className="text-xs text-gray-600">{step.detail}</p>
+                    {step.helper && <p className="text-xs text-gray-500 mt-1">{step.helper}</p>}
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 space-y-2">
+              <p className="text-xs text-gray-500">خروجی‌های آماده ارسال</p>
+              <div className="space-y-1 text-sm text-gray-800">
+                {activeQuickLink.artifacts.map((artifact) => (
+                  <div key={artifact.label} className="space-y-0.5">
+                    <div className="flex items-center justify-between flex-row-reverse">
+                      <span className="font-medium text-gray-900">{artifact.label}</span>
+                      <span className="text-gray-700">{artifact.value}</span>
+                    </div>
+                    {artifact.helper && <p className="text-xs text-gray-500 text-left">{artifact.helper}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Input
+              label="پیام همراه"
+              value={quickLinkNote}
+              onChange={(e) => setQuickLinkNote(e.target.value)}
+              placeholder="مثلاً یادآور کوتاه برای مدیر پروژه"
+            />
+
+            <div className="flex items-center justify-between flex-row-reverse">
+              <p className="text-xs text-gray-500">پس از تایید، پیام و لینک‌ها برای گیرندگان ثبت می‌شود.</p>
+              <div className="flex gap-3 flex-row-reverse">
+                <Button variant="ghost" className="text-sm" onClick={() => setShowQuickLinkDialog(false)}>
+                  انصراف
+                </Button>
+                <Button variant="primary" className="text-sm" onClick={handleConfirmQuickLink}>
+                  تایید و ارسال
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Dialog>
 
       <Dialog
         isOpen={showFieldMissionDialog}
